@@ -1,5 +1,4 @@
 const templateCard = document.querySelector("#card-template").content;
-export const placesListCard = document.querySelector(".places__list");
 
 export function createElement(
   cardData,
@@ -17,7 +16,7 @@ export function createElement(
   imageCard.alt = "Фотография с места - " + cardData.name;
   titleCard.textContent = cardData.name;
 
-  deleteButtonCard.addEventListener("click", removeCard);
+  deleteButtonCard.addEventListener('click', () => removeCard(card));
   likeButtonCard.addEventListener("click", likeCard);
   imageCard.addEventListener("click", function () {
     openPicturePopup(cardData.link, cardData.name);
@@ -26,10 +25,9 @@ export function createElement(
   return card;
 }
 
-export function removeCard(cardData) {
-  const deletedCard = cardData.target.closest(".card");
-  deletedCard.remove();
-}
+export function removeCard(cardElement) {  
+  cardElement.remove(); 
+};  
 
 export function likeCard(evt) {
   if (evt.target.classList.contains("card__like-button")) {

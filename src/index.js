@@ -1,13 +1,13 @@
 import "./pages/index.css";
 import { initialCards } from "./components/cards.js";
-import { openPopup, closePopup } from "./components/modal.js";
+import { openModal, closeModal } from "./components/modal.js";
 import {
   createElement,
   removeCard,
   likeCard,
-  placesListCard,
 } from "./components/card.js";
 
+const placesListCard = document.querySelector(".places__list");
 const popupNewCard = document.querySelector(".popup_type_new-card");
 const popupProfileEdit = document.querySelector(".popup_type_edit");
 const profileAddButton = document.querySelector(".profile__add-button");
@@ -25,13 +25,13 @@ const newPlaceCardlink = newPlaceForm.elements["link"];
 const picturePopup = document.querySelector(".popup_type_image");
 const picturePopupImage = document.querySelector(".popup__image");
 const picturePopupCaption = document.querySelector(".popup__caption");
-const popupCloseButtons = document.querySelectorAll(".popup");
+const popupButtons = document.querySelectorAll(".popup");
 
-function openPicturePopup(link, alt) {
+function openPicturePopup(link, name) {
   picturePopupImage.src = link;
-  picturePopupImage.alt = alt;
-  picturePopupCaption.textContent = alt;
-  openPopup(picturePopup);
+  picturePopupImage.alt = name;
+  picturePopupCaption.textContent = name;
+  openModal(picturePopup);
 }
 
 function addCardToPlacesList(evt) {
@@ -39,7 +39,6 @@ function addCardToPlacesList(evt) {
   const addedCard = {
     name: newPlaceCardName.value,
     link: newPlaceCardlink.value,
-    alt: newPlaceCardName.value,
   };
   const newPlaceCard = createElement(
     addedCard,
@@ -48,7 +47,7 @@ function addCardToPlacesList(evt) {
     openPicturePopup
   );
   placesListCard.prepend(newPlaceCard, placesListCard.firstChild);
-  closePopup(popupNewCard);
+  closeModal(popupNewCard);
   newPlaceForm.reset();
 }
 
@@ -61,30 +60,30 @@ function changeProfile(evt) {
   evt.preventDefault();
   profileTitle.textContent = profileEditName.value;
   profileDescription.textContent = profileEditDescription.value;
-  closePopup(popupProfileEdit);
+  closeModal(popupProfileEdit);
   profileEdit.reset();
 }
 
 function openProfilePopup() {
   setprofileEdit();
-  openPopup(popupProfileEdit);
+  openModal(popupProfileEdit);
 }
 
 newPlaceForm.addEventListener("submit", addCardToPlacesList);
 profileEdit.addEventListener("submit", changeProfile);
 
 profileAddButton.addEventListener("click", function () {
-  openPopup(popupNewCard);
+  openModal(popupNewCard);
 });
 profilEditButton.addEventListener("click", openProfilePopup);
 
-popupCloseButtons.forEach(function (popupUse) {
+popupButtons.forEach(function (popupUse) {
   popupUse.addEventListener("click", function (evt) {
     if (
       evt.target === evt.currentTarget ||
       evt.target.classList.contains("popup__close")
     ) {
-      closePopup(popupUse);
+      closeModal(popupUse);
     }
   });
 });
