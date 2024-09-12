@@ -25,7 +25,7 @@ const newPlaceCardlink = newPlaceForm.elements["link"];
 const picturePopup = document.querySelector(".popup_type_image");
 const picturePopupImage = document.querySelector(".popup__image");
 const picturePopupCaption = document.querySelector(".popup__caption");
-const popupButtons = document.querySelectorAll(".popup");
+const popups = document.querySelectorAll(".popup");
 
 function openPicturePopup(link, name) {
   picturePopupImage.src = link;
@@ -77,16 +77,15 @@ profileAddButton.addEventListener("click", function () {
 });
 profilEditButton.addEventListener("click", openProfilePopup);
 
-popupButtons.forEach(function (popupUse) {
-  popupUse.addEventListener("click", function (evt) {
-    if (
-      evt.target === evt.currentTarget ||
-      evt.target.classList.contains("popup__close")
-    ) {
-      closeModal(popupUse);
-    }
+popups.forEach((popup) => {   // Для каждого попапа делаем следуюущее
+  const closeButton = popup.querySelector('.popup__close'); // Находим в попапе кнопку крестик
+  closeButton.addEventListener('click', () => closeModal(popup)); // Устанавливаем слушатель на крестик
+  popup.addEventListener('mousedown', (event) => {
+    if (event.target === event.currentTarget) {
+      closeModal(popup);
+    } // Устанавливаем слушатель оверлея
   });
-});
+}); 
 
 initialCards.forEach(function (item) {
   const card = createElement(item, removeCard, likeCard, openPicturePopup);
