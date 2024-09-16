@@ -1,11 +1,29 @@
 import "./pages/index.css";
-import { initialCards } from "./components/cards.js";
 import { openModal, closeModal } from "./components/modal.js";
 import {
   createElement,
   removeCard,
   likeCard,
 } from "./components/card.js";
+
+import {
+  enableValidation,
+  validationSettings,
+  clearValidation,
+} from "./components/validation.js";
+
+import {
+  getUserData,
+  getInitialCards,
+  updateAvatar,
+  patchUserData,
+  postNewCard,
+} from "./components/api.js";
+
+let userAvatar = "";
+let userId = "";
+
+enableValidation(validationSettings);
 
 const placesListCard = document.querySelector(".places__list");
 const popupNewCard = document.querySelector(".popup_type_new-card");
@@ -15,13 +33,16 @@ const profilEditButton = document.querySelector(".profile__edit-button");
 const profileTitle = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
 const profileEdit = document.forms.editProfile;
+const avatarFormElement = document.forms.avatarForm;
+const avatarForm = document.querySelector(".popup_type-avatar");
+const profileAvatar = document.querySelector(".profile__image");
 const profileEditName = profileEdit.querySelector(".popup__input_type_name");
 const profileEditDescription = profileEdit.querySelector(
   ".popup__input_type_description"
 );
 const newPlaceForm = document.forms.newPlace;
 const newPlaceCardName = newPlaceForm.elements["place-name"];
-const newPlaceCardlink = newPlaceForm.elements["link"];
+const newPlaceCardlink = newPlaceForm.elements["place-link"];
 const picturePopup = document.querySelector(".popup_type_image");
 const picturePopupImage = document.querySelector(".popup__image");
 const picturePopupCaption = document.querySelector(".popup__caption");
@@ -36,19 +57,23 @@ function openPicturePopup(link, name) {
 
 function addCardToPlacesList(evt) {
   evt.preventDefault();
-  const addedCard = {
-    name: newPlaceCardName.value,
-    link: newPlaceCardlink.value,
-  };
-  const newPlaceCard = createElement(
-    addedCard,
-    removeCard,
-    likeCard,
-    openPicturePopup
-  );
-  placesListCard.prepend(newPlaceCard, placesListCard.firstChild);
-  closeModal(popupNewCard);
-  newPlaceForm.reset();
+  function makeRequest() {
+    return postNewCard(newPlaceCardName.value, newPlaceCardlink.value )
+    .then((addedCard) => {
+      const newPlaceCard = createElement(
+        userId,
+        addedCard,
+        removeCard,
+        likeCard,
+        openPicturePopup
+      );
+      placesListCard.prepend(newPlaceCard);
+      closeModal(popupNewCard);
+      newPlaceForm.reset();
+      clearValidation(newPlaceForm, validationSettings);
+    });
+  }
+  handleSubmit(makeRequest, evt);
 }
 
 function setprofileEdit() {
@@ -58,21 +83,60 @@ function setprofileEdit() {
 
 function changeProfile(evt) {
   evt.preventDefault();
-  profileTitle.textContent = profileEditName.value;
-  profileDescription.textContent = profileEditDescription.value;
-  closeModal(popupProfileEdit);
-  profileEdit.reset();
+  function makeRequest() {
+    const name = profileEditName.value;
+    const about = profileEditDescription.value;
+    return patchUserData(name, about).then((dataUser) => {
+      profileTitle.textContent = dataUser.name;
+      profileDescription.textContent = dataUser.about;
+      console.dir(name, about);
+      closeModal(popupProfileEdit);
+      profileEdit.reset();
+    });
+  }
+  handleSubmit(makeRequest, evt);
 }
 
 function openProfilePopup() {
+  clearValidation(profileEdit, validationSettings);
   setprofileEdit();
   openModal(popupProfileEdit);
 }
 
+profileAvatar.addEventListener("click", function () {
+  clearValidation(avatarForm, validationSettings);
+  openModal(avatarForm);
+});
+
+function changeProfileAvatar(evt) {
+  evt.preventDefault();
+  const saveButton = evt.submitter;
+  const avatarUrl = avatarFormElement.elements["avatar-link"].value;
+  renderLoading(true, saveButton);
+
+  updateAvatar(avatarUrl)
+    .then((res) => {
+      profileAvatar.setAttribute(
+        "style",
+        `background-image: url('${res.avatar}')`
+      );
+      closeModal(avatarForm);
+    })
+    .catch((error) => {
+      console.error("Ошибка при сохранении аватара:", error);
+    })
+    .finally(() => {
+      renderLoading(false, saveButton);
+    });
+}
+
+
 newPlaceForm.addEventListener("submit", addCardToPlacesList);
 profileEdit.addEventListener("submit", changeProfile);
+avatarFormElement.addEventListener("submit", changeProfileAvatar);
 
 profileAddButton.addEventListener("click", function () {
+  clearValidation(newPlaceForm, validationSettings);
   openModal(popupNewCard);
 });
 profilEditButton.addEventListener("click", openProfilePopup);
@@ -87,7 +151,52 @@ popups.forEach((popup) => {   // Для каждого попапа делаем
   });
 }); 
 
-initialCards.forEach(function (item) {
-  const card = createElement(item, removeCard, likeCard, openPicturePopup);
+Promise.all([getInitialCards(), getUserData()])
+  .then(([initialCards, userData]) => {
+    userAvatar = userData.avatar;
+    userId = userData._id;
+    profileTitle.textContent = userData.name;
+    profileDescription.textContent = userData.about;
+    profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
+
+initialCards.forEach(function (cardData) {
+  const card = createElement(userId, cardData, removeCard, likeCard, openPicturePopup);
   placesListCard.prepend(card);
 });
+})
+.catch((err) => {
+console.log(err);
+});
+
+export function handleSubmit(request, evt, loadingText = "Сохранение...") {
+  evt.preventDefault();
+
+  const submitButton = evt.submitter;
+  const initialText = submitButton.textContent;
+  renderLoading(true, submitButton, initialText, loadingText);
+
+  
+  request()
+    .then(() => {
+      evt.target.reset(); 
+    })
+    .catch((err) => {
+      console.error(`Ошибка: ${err}`);
+    })
+    .finally(() => {
+      renderLoading(false, submitButton, initialText, loadingText);
+    });
+}
+
+function renderLoading(
+  isLoading,
+  button,
+  initialText = "Сохранить",
+  loadingText = "Сохранение..."
+) {
+  if (isLoading) {
+    button.textContent = loadingText;
+  } else {
+    button.textContent = initialText;
+  }
+}
