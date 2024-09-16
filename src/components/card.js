@@ -42,7 +42,7 @@ export function createElement(
   return card;
 }
 
-export function removeCard(card, cardId) {  
+export function removeCard(card, cardId) {
   const cardToRemove = card.closest(".card");
   removeFullCard(cardId)
     .then(() => {
@@ -51,7 +51,7 @@ export function removeCard(card, cardId) {
     .catch((err) => {
       console.error(`"Произошла ошибка при удалении карточки:", ${err}`);
     });
-};  
+}
 
 export function likeCard(cardLikeCounter, likeButtonCard, cardData) {
   if (likeButtonCard.classList.contains("card__like-button_is-active")) {

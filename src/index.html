@@ -55,7 +55,10 @@
               maxlength="40"
               required
             />
-            <span id="name-input-error" class="name-input-error popup__input_error"></span>
+            <span
+              id="name-input-error"
+              class="name-input-error popup__input_error"
+            ></span>
             <input
               id="description-input"
               pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]+$"
@@ -68,7 +71,8 @@
               maxlength="200"
               required
             />
-            <span id="description-input-error"
+            <span
+              id="description-input-error"
               class="description-input-error popup__input_error"
             ></span>
             <button type="submit" class="button popup__button">
@@ -83,27 +87,33 @@
           <h3 class="popup__title">Новое место</h3>
           <form class="popup__form" name="newPlace" novalidate>
             <input
-            id="place-input"
-            pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]+$"
-            data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
-            type="text"
-            name="place-name"
-            class="popup__input popup__input_type_card-name"
-            placeholder="Название"
-            minlength="2"
-            maxlength="30"
-            required
-          />
-          <span id="place-input-error" class="place-input-error popup__input_error"></span>
-          <input
-            id="place-url-input"
-            type="url"
-            name="place-link"
-            class="popup__input popup__input_type_url"
-            placeholder="Ссылка на картинку"
-            required
-          />
-          <span id="place-url-input-error" class="place-url-input-error popup__input_error"></span>
+              id="place-input"
+              pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]+$"
+              data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
+              type="text"
+              name="place-name"
+              class="popup__input popup__input_type_card-name"
+              placeholder="Название"
+              minlength="2"
+              maxlength="30"
+              required
+            />
+            <span
+              id="place-input-error"
+              class="place-input-error popup__input_error"
+            ></span>
+            <input
+              id="place-url-input"
+              type="url"
+              name="place-link"
+              class="popup__input popup__input_type_url"
+              placeholder="Ссылка на картинку"
+              required
+            />
+            <span
+              id="place-url-input-error"
+              class="place-url-input-error popup__input_error"
+            ></span>
             <button type="submit" class="button popup__button">
               Сохранить
             </button>
@@ -146,10 +156,10 @@
         <div class="card__description">
           <h2 class="card__title"></h2>
           <div class="card__like-container">
-          <button type="button" class="card__like-button"></button>
-          <span class="card__like-counter"></span>
+            <button type="button" class="card__like-button"></button>
+            <span class="card__like-counter"></span>
           </div>
-       </div>
+        </div>
       </li>
     </template>
   </body>

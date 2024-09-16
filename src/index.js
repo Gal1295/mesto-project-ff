@@ -1,10 +1,6 @@
 import "./pages/index.css";
 import { openModal, closeModal } from "./components/modal.js";
-import {
-  createElement,
-  removeCard,
-  likeCard,
-} from "./components/card.js";
+import { createElement, removeCard, likeCard } from "./components/card.js";
 
 import {
   enableValidation,
@@ -58,20 +54,21 @@ function openPicturePopup(link, name) {
 function addCardToPlacesList(evt) {
   evt.preventDefault();
   function makeRequest() {
-    return postNewCard(newPlaceCardName.value, newPlaceCardlink.value )
-    .then((addedCard) => {
-      const newPlaceCard = createElement(
-        userId,
-        addedCard,
-        removeCard,
-        likeCard,
-        openPicturePopup
-      );
-      placesListCard.prepend(newPlaceCard);
-      closeModal(popupNewCard);
-      newPlaceForm.reset();
-      clearValidation(newPlaceForm, validationSettings);
-    });
+    return postNewCard(newPlaceCardName.value, newPlaceCardlink.value).then(
+      (addedCard) => {
+        const newPlaceCard = createElement(
+          userId,
+          addedCard,
+          removeCard,
+          likeCard,
+          openPicturePopup
+        );
+        placesListCard.prepend(newPlaceCard);
+        closeModal(popupNewCard);
+        newPlaceForm.reset();
+        clearValidation(newPlaceForm, validationSettings);
+      }
+    );
   }
   handleSubmit(makeRequest, evt);
 }
@@ -130,7 +127,6 @@ function changeProfileAvatar(evt) {
     });
 }
 
-
 newPlaceForm.addEventListener("submit", addCardToPlacesList);
 profileEdit.addEventListener("submit", changeProfile);
 avatarFormElement.addEventListener("submit", changeProfileAvatar);
@@ -141,15 +137,16 @@ profileAddButton.addEventListener("click", function () {
 });
 profilEditButton.addEventListener("click", openProfilePopup);
 
-popups.forEach((popup) => {   // Для каждого попапа делаем следуюущее
-  const closeButton = popup.querySelector('.popup__close'); // Находим в попапе кнопку крестик
-  closeButton.addEventListener('click', () => closeModal(popup)); // Устанавливаем слушатель на крестик
-  popup.addEventListener('mousedown', (event) => {
+popups.forEach((popup) => {
+  // Для каждого попапа делаем следуюущее
+  const closeButton = popup.querySelector(".popup__close"); // Находим в попапе кнопку крестик
+  closeButton.addEventListener("click", () => closeModal(popup)); // Устанавливаем слушатель на крестик
+  popup.addEventListener("mousedown", (event) => {
     if (event.target === event.currentTarget) {
       closeModal(popup);
     } // Устанавливаем слушатель оверлея
   });
-}); 
+});
 
 Promise.all([getInitialCards(), getUserData()])
   .then(([initialCards, userData]) => {
@@ -159,14 +156,20 @@ Promise.all([getInitialCards(), getUserData()])
     profileDescription.textContent = userData.about;
     profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
 
-initialCards.forEach(function (cardData) {
-  const card = createElement(userId, cardData, removeCard, likeCard, openPicturePopup);
-  placesListCard.prepend(card);
-});
-})
-.catch((err) => {
-console.log(err);
-});
+    initialCards.forEach(function (cardData) {
+      const card = createElement(
+        userId,
+        cardData,
+        removeCard,
+        likeCard,
+        openPicturePopup
+      );
+      placesListCard.prepend(card);
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 export function handleSubmit(request, evt, loadingText = "Сохранение...") {
   evt.preventDefault();
@@ -175,10 +178,9 @@ export function handleSubmit(request, evt, loadingText = "Сохранение..
   const initialText = submitButton.textContent;
   renderLoading(true, submitButton, initialText, loadingText);
 
-  
   request()
     .then(() => {
-      evt.target.reset(); 
+      evt.target.reset();
     })
     .catch((err) => {
       console.error(`Ошибка: ${err}`);
