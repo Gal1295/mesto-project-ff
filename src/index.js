@@ -16,6 +16,8 @@ import {
   postNewCard,
 } from "./components/api.js";
 
+import {renderLoading} from "./components/utils.js";
+
 let userAvatar = "";
 let userId = "";
 
@@ -54,8 +56,8 @@ function openPicturePopup(link, name) {
 function addCardToPlacesList(evt) {
   evt.preventDefault();
   function makeRequest() {
-    return postNewCard(newPlaceCardName.value, newPlaceCardlink.value).then(
-      (addedCard) => {
+    return postNewCard(newPlaceCardName.value, newPlaceCardlink.value)
+    .then((addedCard) => {
         const newPlaceCard = createElement(
           userId,
           addedCard,
@@ -73,7 +75,7 @@ function addCardToPlacesList(evt) {
   handleSubmit(makeRequest, evt);
 }
 
-function setprofileEdit() {
+function setProfileFormInputData() {
   profileEditName.value = profileTitle.textContent;
   profileEditDescription.value = profileDescription.textContent;
 }
@@ -96,7 +98,7 @@ function changeProfile(evt) {
 
 function openProfilePopup() {
   clearValidation(profileEdit, validationSettings);
-  setprofileEdit();
+  setProfileFormInputData();
   openModal(popupProfileEdit);
 }
 
@@ -132,7 +134,6 @@ profileEdit.addEventListener("submit", changeProfile);
 avatarFormElement.addEventListener("submit", changeProfileAvatar);
 
 profileAddButton.addEventListener("click", function () {
-  clearValidation(newPlaceForm, validationSettings);
   openModal(popupNewCard);
 });
 profilEditButton.addEventListener("click", openProfilePopup);
@@ -164,7 +165,7 @@ Promise.all([getInitialCards(), getUserData()])
         likeCard,
         openPicturePopup
       );
-      placesListCard.prepend(card);
+      placesListCard.append(card);
     });
   })
   .catch((err) => {
@@ -188,17 +189,4 @@ export function handleSubmit(request, evt, loadingText = "Сохранение..
     .finally(() => {
       renderLoading(false, submitButton, initialText, loadingText);
     });
-}
-
-function renderLoading(
-  isLoading,
-  button,
-  initialText = "Сохранить",
-  loadingText = "Сохранение..."
-) {
-  if (isLoading) {
-    button.textContent = loadingText;
-  } else {
-    button.textContent = initialText;
-  }
 }
